@@ -10,7 +10,7 @@ real(8) tol, a,b,c
 real(8), allocatable, dimension(:) :: P, PTrans
 complex(8), allocatable, dimension(:) :: raices
 
-n = 3
+n = 2
 max_iter = 100
 tol = 0.0001
 allocate(P(0:n), raices(1:n))
@@ -19,15 +19,18 @@ allocate(P(0:n), raices(1:n))
 !P(1) = -9.
 !P(2) = 1.
 !P(3) = 1.
-P(0) = -1.
-P(1) = 0.
-P(2) = -2.
-P(3) = 1.
+!P(0) = -1.
+!P(1) = 0.
+!P(2) = -2.
+!P(3) = 1.
 !P(0) = 10.
 !P(1) = 7.
 !P(2) = -2.
 !P(3) = 2.
 !P(4) = 1.
+P(0) = 16.004
+P(1) = -8.001
+P(2) = 1.
 
 do while (op /= 7)
     write(*, '(A)') 'Algortimo QD'
@@ -54,6 +57,23 @@ do while (op /= 7)
             call traslacion_indeterminada(P, n, c, PTrans)
             call QD(PTrans, n, tol, max_iter, raices)
             raices(:) = raices(:) + c
+            call mostrar_raices(raices, n, tol)
+            deallocate(PTrans)
+
+        case(3)
+            allocate(PTrans(0:n))
+            call transformacion_reciproca(P, n, PTrans)
+            call QD(PTrans, n, tol, max_iter, raices)
+            raices(:) = 1. /raices(:)
+            call mostrar_raices(raices, n, tol)
+            deallocate(PTrans)
+
+        case(4)
+            allocate(PTrans(0:n))
+            write(*,*) 'Ingrese el valor de "c" para aplicar la transformacion'
+            read(*,*) c
+            PTrans(:) = P(:) * c
+            call QD(PTrans, n, tol, max_iter, raices)
             call mostrar_raices(raices, n, tol)
             deallocate(PTrans)
 
@@ -294,6 +314,21 @@ subroutine traslacion_indeterminada(P, n, c, PTrans)
     end do
 
 end subroutine traslacion_indeterminada
+
+!###############################################################################
+
+subroutine transformacion_reciproca(P, n, Ptrans)
+    integer, intent(in) :: n
+    real(8), dimension(0:n), intent(in) :: P
+    real(8), dimension(0:n), intent(out) :: PTrans
+
+    integer k
+
+    do k=0, n
+        PTrans(n-k) = P(k)
+    end do
+
+end subroutine transformacion_reciproca
 
 !###############################################################################
 
